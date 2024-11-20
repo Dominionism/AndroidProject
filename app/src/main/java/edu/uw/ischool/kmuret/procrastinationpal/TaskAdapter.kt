@@ -10,8 +10,10 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class TaskAdapter(private val taskList: MutableList<Task>) :
-    RecyclerView.Adapter<TaskAdapter.TaskViewHolder>() {
+class TaskAdapter(
+    private val taskList: MutableList<Task>,
+    private val onTaskCheckedChanged: (position: Int, isChecked: Boolean) -> Unit
+) : RecyclerView.Adapter<TaskAdapter.TaskViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskViewHolder {
         val view = LayoutInflater.from(parent.context)
@@ -21,7 +23,7 @@ class TaskAdapter(private val taskList: MutableList<Task>) :
 
     override fun onBindViewHolder(holder: TaskViewHolder, position: Int) {
         val task = taskList[position]
-        holder.bind(task)
+        holder.bind(task, position)
     }
 
     override fun getItemCount(): Int = taskList.size
@@ -31,7 +33,7 @@ class TaskAdapter(private val taskList: MutableList<Task>) :
         private val taskDeadline: TextView = itemView.findViewById(R.id.taskDeadline)
         private val taskCheckBox: CheckBox = itemView.findViewById(R.id.taskCheckBox)
 
-        fun bind(task: Task) {
+        fun bind(task: Task, position: Int) {
             taskName.text = task.name
 
             // format deadline timestamp to 12-hour AM/PM format
@@ -39,11 +41,12 @@ class TaskAdapter(private val taskList: MutableList<Task>) :
             val formattedDate = dateFormat.format(Date(task.deadlineTimestamp))
             taskDeadline.text = formattedDate
 
+            taskCheckBox.setOnCheckedChangeListener(null)
             taskCheckBox.isChecked = task.isCompleted
 
-            // update task completion status
             taskCheckBox.setOnCheckedChangeListener { _, isChecked ->
                 task.isCompleted = isChecked
+                onTaskCheckedChanged(position, isChecked)
             }
         }
     }

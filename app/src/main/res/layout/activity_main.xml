@@ -6,7 +6,11 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <!-- Title/Header -->
+    <nl.dionsegijn.konfetti.xml.KonfettiView
+        android:id="@+id/konfettiView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
     <TextView
         android:id="@+id/mainHeader"
         android:layout_width="match_parent"
@@ -18,7 +22,6 @@
         android:textSize="24sp"
         android:textStyle="bold" />
 
-    <!-- Pie Chart Button -->
     <ImageButton
         android:id="@+id/pieChartButton"
         android:layout_width="60dp"
@@ -28,7 +31,6 @@
         android:background="?android:attr/selectableItemBackgroundBorderless"
         android:layout_alignParentRight="true" />
 
-    <!-- RecyclerView for To-Do List -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/todoRecyclerView"
         android:layout_width="match_parent"
@@ -38,7 +40,6 @@
         android:clipToPadding="false"
         android:padding="8dp" />
 
-    <!-- Add Task Floating Button -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabAddTask"
         android:layout_width="wrap_content"
@@ -48,4 +49,5 @@
         android:layout_margin="16dp"
         android:src="@drawable/ic_add"
         android:contentDescription="Add Task" />
+
 </RelativeLayout>
