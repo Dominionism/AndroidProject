@@ -20,7 +20,8 @@
         android:text="To-Do List"
         android:textColor="@android:color/black"
         android:textSize="24sp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        tools:ignore="HardcodedText" />
 
     <ImageButton
         android:id="@+id/pieChartButton"
@@ -29,7 +30,8 @@
         android:src="@drawable/ic_pie_chart"
         android:contentDescription="Pie Chart"
         android:background="?android:attr/selectableItemBackgroundBorderless"
-        android:layout_alignParentRight="true" />
+        android:layout_alignParentEnd="true"
+        tools:ignore="HardcodedText" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/todoRecyclerView"
@@ -48,6 +50,7 @@
         android:layout_alignParentBottom="true"
         android:layout_margin="16dp"
         android:src="@drawable/ic_add"
-        android:contentDescription="Add Task" />
+        android:contentDescription="Add Task"
+        tools:ignore="HardcodedText" />
 
 </RelativeLayout>

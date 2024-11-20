@@ -15,6 +15,7 @@ class AddTaskActivity : AppCompatActivity() {
 
     private lateinit var dateEditText: EditText
     private lateinit var timeEditText: EditText
+    private lateinit var taskName: EditText
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,6 +23,7 @@ class AddTaskActivity : AppCompatActivity() {
 
         dateEditText = findViewById(R.id.dateEditText)
         timeEditText = findViewById(R.id.timeEditText)
+        taskName = findViewById(R.id.taskNameEditText)
 
         val calendar = Calendar.getInstance()
 
@@ -69,7 +71,7 @@ class AddTaskActivity : AppCompatActivity() {
             // Combine date and time into a timestamp
             val selectedTimestamp = calendar.timeInMillis
             val task = Task(
-                name = "New Task",
+                name = taskName.text.toString(),
                 deadlineTimestamp = selectedTimestamp,
                 isCompleted = false
             )

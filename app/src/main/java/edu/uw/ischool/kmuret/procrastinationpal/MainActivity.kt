@@ -8,14 +8,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import nl.dionsegijn.konfetti.xml.KonfettiView
 import nl.dionsegijn.konfetti.core.Party
 import nl.dionsegijn.konfetti.core.Position
 import nl.dionsegijn.konfetti.core.emitter.Emitter
-import java.text.SimpleDateFormat
-import java.util.Locale
+import nl.dionsegijn.konfetti.xml.KonfettiView
 import java.util.concurrent.TimeUnit
 
+@Suppress("DEPRECATION")
 class MainActivity : AppCompatActivity() {
 
     private lateinit var todoRecyclerView: RecyclerView
@@ -65,9 +64,6 @@ class MainActivity : AppCompatActivity() {
             intent.putParcelableArrayListExtra("tasks", ArrayList(taskList))
             startActivity(intent)
         }
-
-        // Load testing tasks
-        loadDummyTasks()
     }
 
     private fun hasCompletedTasks(): Boolean {
@@ -88,6 +84,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     // Handle result from AddTaskActivity
+    @Deprecated("This method has been deprecated in favor of using the Activity Result API\n      which brings increased type safety via an {@link ActivityResultContract} and the prebuilt\n      contracts for common intents available in\n      {@link androidx.activity.result.contract.ActivityResultContracts}, provides hooks for\n      testing, and allow receiving results in separate, testable classes independent from your\n      activity. Use\n      {@link #registerForActivityResult(ActivityResultContract, ActivityResultCallback)}\n      with the appropriate {@link ActivityResultContract} and handling the result in the\n      {@link ActivityResultCallback#onActivityResult(Object) callback}.")
+    @SuppressLint("NotifyDataSetChanged")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_CODE_ADD_TASK && resultCode == RESULT_OK) {
@@ -97,14 +95,6 @@ class MainActivity : AppCompatActivity() {
                 taskAdapter.notifyDataSetChanged()
             }
         }
-    }
-
-    private fun loadDummyTasks() {
-        val dateFormat = SimpleDateFormat("yyyy-MM-dd hh:mm a", Locale.getDefault())
-        taskList.add(Task("Finish assignment", dateFormat.parse("2024-11-20 03:00 PM")?.time ?: 0L, false))
-        taskList.add(Task("Grocery shopping", dateFormat.parse("2024-11-18 10:30 AM")?.time ?: 0L, false))
-        taskList.add(Task("Plan meeting", dateFormat.parse("2024-11-19 01:15 PM")?.time ?: 0L, true))
-        taskAdapter.notifyDataSetChanged()
     }
 
     companion object {
