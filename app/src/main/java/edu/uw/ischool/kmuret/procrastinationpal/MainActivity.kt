@@ -7,6 +7,9 @@ import android.widget.ImageButton
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import nl.dionsegijn.konfetti.core.Party
 import nl.dionsegijn.konfetti.core.Position
@@ -24,6 +27,8 @@ class MainActivity : AppCompatActivity() {
 
     private val taskList = mutableListOf<Task>()
     private lateinit var taskAdapter: TaskAdapter
+
+    private var workManager: WorkManager? = null
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -82,7 +87,6 @@ class MainActivity : AppCompatActivity() {
         )
         konfettiView.start(party)
     }
-
     // Handle result from AddTaskActivity
     @Deprecated("This method has been deprecated in favor of using the Activity Result API\n      which brings increased type safety via an {@link ActivityResultContract} and the prebuilt\n      contracts for common intents available in\n      {@link androidx.activity.result.contract.ActivityResultContracts}, provides hooks for\n      testing, and allow receiving results in separate, testable classes independent from your\n      activity. Use\n      {@link #registerForActivityResult(ActivityResultContract, ActivityResultCallback)}\n      with the appropriate {@link ActivityResultContract} and handling the result in the\n      {@link ActivityResultCallback#onActivityResult(Object) callback}.")
     @SuppressLint("NotifyDataSetChanged")
@@ -94,6 +98,12 @@ class MainActivity : AppCompatActivity() {
                 taskList.add(it)
                 taskAdapter.notifyDataSetChanged()
             }
+            val workRequest = PeriodicWorkRequestBuilder<TaskReminderWorker>(16, TimeUnit.MINUTES).build()
+            WorkManager.getInstance(this).enqueueUniquePeriodicWork(
+                "TaskReminder",
+                ExistingPeriodicWorkPolicy.KEEP,
+                workRequest
+            )
         }
     }
 
