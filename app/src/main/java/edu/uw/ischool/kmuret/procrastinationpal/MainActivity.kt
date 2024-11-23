@@ -23,6 +23,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var todoRecyclerView: RecyclerView
     private lateinit var fabAddTask: FloatingActionButton
     private lateinit var pieChartButton: ImageButton
+    private lateinit var settingsButton: ImageButton
     private lateinit var konfettiView: KonfettiView
 
     private val taskList = mutableListOf<Task>()
@@ -39,6 +40,7 @@ class MainActivity : AppCompatActivity() {
         todoRecyclerView = findViewById(R.id.todoRecyclerView)
         fabAddTask = findViewById(R.id.fabAddTask)
         pieChartButton = findViewById(R.id.pieChartButton)
+        settingsButton = findViewById(R.id.settingButton)
         konfettiView = findViewById(R.id.konfettiView)
 
         taskAdapter = TaskAdapter(taskList) { position, isChecked ->
@@ -67,6 +69,11 @@ class MainActivity : AppCompatActivity() {
             }
             val intent = Intent(this, PieChartActivity::class.java)
             intent.putParcelableArrayListExtra("tasks", ArrayList(taskList))
+            startActivity(intent)
+        }
+
+        settingsButton.setOnClickListener {
+            val intent = Intent(this, SettingsActivity::class.java)
             startActivity(intent)
         }
     }
