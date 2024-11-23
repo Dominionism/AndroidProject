@@ -24,6 +24,17 @@
         tools:ignore="HardcodedText" />
 
     <ImageButton
+        android:id="@+id/settingButton"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:src="@drawable/ic_setting"
+        android:contentDescription="Settings"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="60dp"
+        android:background="?android:attr/selectableItemBackgroundBorderless"
+        tools:ignore="HardcodedText" />
+
+    <ImageButton
         android:id="@+id/pieChartButton"
         android:layout_width="60dp"
         android:layout_height="60dp"
