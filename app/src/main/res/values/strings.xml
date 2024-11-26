@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">ProcrastinationPal</string>
+    <string name="anonymous_procrastinator">- Anonymous Procrastinator</string>
+    <string name="get_another_motivation">Get Another Motivation</string>
+    <string name="motivation_boost">Motivation Boost</string>
+    <string name="procrastination_is_like_a_credit_card_it">Procrastination is like a credit card: it</string>
+    <string name="back">Back</string>
+    <string name="task_progress">Task Progress</string>
 </resources>
