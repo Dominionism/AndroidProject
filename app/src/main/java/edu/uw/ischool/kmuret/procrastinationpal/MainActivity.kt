@@ -33,7 +33,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var konfettiView: KonfettiView
     private lateinit var motivation: ImageButton
 
-    private val taskList = mutableListOf<Task>()
+    private var taskList = mutableListOf<Task>()
     private lateinit var taskAdapter: TaskAdapter
 
 //    private var workManager: WorkManager? = null
@@ -42,6 +42,8 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        taskList = loadTasks(this)
 
         todoRecyclerView = findViewById(R.id.todoRecyclerView)
         fabAddTask = findViewById(R.id.fabAddTask)
@@ -59,6 +61,7 @@ class MainActivity : AppCompatActivity() {
                 }
             },
             onDelete = { position, task ->
+                saveTasks(taskList, this)
                 Toast.makeText(this, "Deleted: ${task?.name}", Toast.LENGTH_SHORT).show()
             }
         )
@@ -173,6 +176,7 @@ class MainActivity : AppCompatActivity() {
             newTask?.let {
                 taskList.add(it)
                 taskAdapter.notifyDataSetChanged()
+                saveTasks(taskList, this)
             }
             val workRequest = PeriodicWorkRequestBuilder<TaskReminderWorker>(16, TimeUnit.MINUTES).build()
             WorkManager.getInstance(this).enqueueUniquePeriodicWork(
