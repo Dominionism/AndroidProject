@@ -12,7 +12,8 @@ import java.util.Locale
 
 class TaskAdapter(
     private val taskList: MutableList<Task>,
-    private val onTaskCheckedChanged: (position: Int, isChecked: Boolean) -> Unit
+    private val onTaskCheckedChanged: (position: Int, isChecked: Boolean) -> Unit,
+    private val onDelete: (position: Int, task: Task?) -> Unit
 ) : RecyclerView.Adapter<TaskAdapter.TaskViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskViewHolder {
@@ -27,6 +28,13 @@ class TaskAdapter(
     }
 
     override fun getItemCount(): Int = taskList.size
+
+    fun removeTask(position: Int) {
+        val removeTask = taskList[position]
+        taskList.removeAt(position)
+        notifyItemRemoved(position)
+        onDelete(position, removeTask)
+    }
 
     inner class TaskViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val taskName: TextView = itemView.findViewById(R.id.taskName)

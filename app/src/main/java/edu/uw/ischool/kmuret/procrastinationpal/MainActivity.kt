@@ -2,9 +2,15 @@ package edu.uw.ischool.kmuret.procrastinationpal
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
 import android.os.Bundle
 import android.widget.ImageButton
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.runtime.Composable
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.work.ExistingPeriodicWorkPolicy
@@ -43,15 +49,74 @@ class MainActivity : AppCompatActivity() {
         settingsButton = findViewById(R.id.settingButton)
         konfettiView = findViewById(R.id.konfettiView)
 
-        taskAdapter = TaskAdapter(taskList) { position, isChecked ->
-            taskList[position].isCompleted = isChecked
-            if (isChecked) {
-                showConfetti()
+        taskAdapter = TaskAdapter(
+            taskList,
+            onTaskCheckedChanged = { position, isChecked ->
+                taskList[position].isCompleted = isChecked
+                if (isChecked) {
+                    showConfetti()
+                }
+            },
+            onDelete = { position, task ->
+                Toast.makeText(this, "Deleted: ${task?.name}", Toast.LENGTH_SHORT).show()
             }
-        }
+        )
 
         todoRecyclerView.layoutManager = LinearLayoutManager(this)
         todoRecyclerView.adapter = taskAdapter
+
+        val itemTouchHelper = ItemTouchHelper(
+            object : ItemTouchHelper.SimpleCallback(0,
+                ItemTouchHelper.LEFT
+            ){
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean = false
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val position = viewHolder.adapterPosition
+                taskAdapter.removeTask(position)
+            }
+
+            override fun onChildDraw(
+                c: Canvas,
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                dX: Float,
+                dY: Float,
+                actionState: Int,
+                isCurrentlyActive: Boolean
+            ) {
+                val itemView = viewHolder.itemView
+                val paint = Paint()
+
+                paint.color = Color.RED
+
+                if (dX < 0) {
+                    c.drawRect(
+                        itemView.right.toFloat() + dX,
+                        itemView.top.toFloat(),
+                        itemView.right.toFloat(),
+                        itemView.bottom.toFloat(),
+                        paint
+                    )
+                }
+
+                super.onChildDraw(
+                    c,
+                    recyclerView,
+                    viewHolder,
+                    dX,
+                    dY,
+                    actionState,
+                    isCurrentlyActive
+                )
+            }
+        })
+
+        itemTouchHelper.attachToRecyclerView(todoRecyclerView)
 
         // floating add new task button
         fabAddTask.setOnClickListener {
