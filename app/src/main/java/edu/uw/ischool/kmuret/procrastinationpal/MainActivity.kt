@@ -31,23 +31,24 @@ class MainActivity : AppCompatActivity() {
     private lateinit var pieChartButton: ImageButton
     private lateinit var settingsButton: ImageButton
     private lateinit var konfettiView: KonfettiView
+    private lateinit var motivation: ImageButton
 
     private val taskList = mutableListOf<Task>()
     private lateinit var taskAdapter: TaskAdapter
 
-    private var workManager: WorkManager? = null
+//    private var workManager: WorkManager? = null
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // initialize views
         todoRecyclerView = findViewById(R.id.todoRecyclerView)
         fabAddTask = findViewById(R.id.fabAddTask)
         pieChartButton = findViewById(R.id.pieChartButton)
         settingsButton = findViewById(R.id.settingButton)
         konfettiView = findViewById(R.id.konfettiView)
+        motivation = findViewById(R.id.motivation_button)
 
         taskAdapter = TaskAdapter(
             taskList,
@@ -127,7 +128,6 @@ class MainActivity : AppCompatActivity() {
             startActivityForResult(intent, REQUEST_CODE_ADD_TASK)
         }
 
-        // open pie chart page
         pieChartButton.setOnClickListener {
             if (hasCompletedTasks()) {
                 showConfetti()
@@ -139,6 +139,11 @@ class MainActivity : AppCompatActivity() {
 
         settingsButton.setOnClickListener {
             val intent = Intent(this, SettingsActivity::class.java)
+            startActivity(intent)
+        }
+
+        motivation.setOnClickListener {
+            val intent = Intent(this, Motivation::class.java)
             startActivity(intent)
         }
     }
@@ -159,7 +164,6 @@ class MainActivity : AppCompatActivity() {
         )
         konfettiView.start(party)
     }
-    // Handle result from AddTaskActivity
     @Deprecated("This method has been deprecated in favor of using the Activity Result API\n      which brings increased type safety via an {@link ActivityResultContract} and the prebuilt\n      contracts for common intents available in\n      {@link androidx.activity.result.contract.ActivityResultContracts}, provides hooks for\n      testing, and allow receiving results in separate, testable classes independent from your\n      activity. Use\n      {@link #registerForActivityResult(ActivityResultContract, ActivityResultCallback)}\n      with the appropriate {@link ActivityResultContract} and handling the result in the\n      {@link ActivityResultCallback#onActivityResult(Object) callback}.")
     @SuppressLint("NotifyDataSetChanged")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

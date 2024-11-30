@@ -13,7 +13,7 @@
         android:layout_height="48dp"
         android:background="@null"
         android:src="@drawable/ic_arrow_back"
-        android:contentDescription="Back"
+        android:contentDescription="@string/back"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_margin="16dp"/>
@@ -25,7 +25,7 @@
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
         android:padding="16dp"
-        android:text="Task Progress"
+        android:text="@string/task_progress"
         android:textColor="@android:color/black"
         android:textSize="24sp"
         android:textStyle="bold"
