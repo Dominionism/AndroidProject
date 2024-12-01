@@ -128,9 +128,6 @@ class MainActivity : AppCompatActivity() {
         }
 
         pieChartButton.setOnClickListener {
-            if (hasCompletedTasks()) {
-                showConfetti()
-            }
             val intent = Intent(this, PieChartActivity::class.java)
             intent.putParcelableArrayListExtra("tasks", ArrayList(taskList))
             startActivity(intent)
