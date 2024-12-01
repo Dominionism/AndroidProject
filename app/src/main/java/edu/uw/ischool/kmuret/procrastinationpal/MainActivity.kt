@@ -122,11 +122,7 @@ class MainActivity : AppCompatActivity() {
 
         itemTouchHelper.attachToRecyclerView(todoRecyclerView)
 
-        // floating add new task button
         fabAddTask.setOnClickListener {
-            if (hasCompletedTasks()) {
-                showConfetti()
-            }
             val intent = Intent(this, AddTaskActivity::class.java)
             startActivityForResult(intent, REQUEST_CODE_ADD_TASK)
         }
