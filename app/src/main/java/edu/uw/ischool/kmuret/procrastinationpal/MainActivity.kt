@@ -9,7 +9,6 @@ import android.os.Bundle
 import android.widget.ImageButton
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.runtime.Composable
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -60,7 +59,7 @@ class MainActivity : AppCompatActivity() {
                     showConfetti()
                 }
             },
-            onDelete = { position, task ->
+            onDelete = { _, task ->
                 saveTasks(taskList, this)
                 Toast.makeText(this, "Deleted: ${task?.name}", Toast.LENGTH_SHORT).show()
             }
@@ -142,10 +141,6 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, Motivation::class.java)
             startActivity(intent)
         }
-    }
-
-    private fun hasCompletedTasks(): Boolean {
-        return taskList.any { it.isCompleted }
     }
 
     private fun showConfetti() {
