@@ -1,6 +1,5 @@
 package edu.uw.ischool.kmuret.procrastinationpal
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Canvas
 import android.graphics.Color
@@ -8,6 +7,7 @@ import android.graphics.Paint
 import android.os.Bundle
 import android.widget.ImageButton
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -25,6 +25,7 @@ import java.util.concurrent.TimeUnit
 @Suppress("DEPRECATION")
 class MainActivity : AppCompatActivity() {
 
+    // UI Components
     private lateinit var todoRecyclerView: RecyclerView
     private lateinit var fabAddTask: FloatingActionButton
     private lateinit var pieChartButton: ImageButton
@@ -35,22 +36,58 @@ class MainActivity : AppCompatActivity() {
     private var taskList = mutableListOf<Task>()
     private lateinit var taskAdapter: TaskAdapter
 
-//    private var workManager: WorkManager? = null
+    private val editTaskLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == RESULT_OK) {
+            val updatedTask = result.data?.getParcelableExtra<Task>("task")
+            val position = result.data?.getIntExtra("position", -1)
 
-    @SuppressLint("MissingInflatedId")
+            if (updatedTask != null && position != null && position != -1) {
+                taskList[position] = updatedTask
+                taskAdapter.notifyItemChanged(position)
+                saveTasks(taskList, this)
+            }
+        }
+    }
+
+    private val addTaskLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == RESULT_OK) {
+            val newTask = result.data?.getParcelableExtra<Task>("task")
+            newTask?.let {
+                taskList.add(it)
+                taskAdapter.notifyItemChanged(taskList.size - 1)
+                saveTasks(taskList, this)
+
+                // Schedule periodic work for task reminders
+                scheduleTaskReminders()
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
         taskList = loadTasks(this)
 
+        initializeViews()
+        setupTaskAdapter()
+        setupItemTouchHelper()
+        setupButtonListeners()
+    }
+
+    private fun initializeViews() {
         todoRecyclerView = findViewById(R.id.todoRecyclerView)
         fabAddTask = findViewById(R.id.fabAddTask)
         pieChartButton = findViewById(R.id.pieChartButton)
         settingsButton = findViewById(R.id.settingButton)
         konfettiView = findViewById(R.id.konfettiView)
         motivation = findViewById(R.id.motivation_button)
+    }
 
+    private fun setupTaskAdapter() {
         taskAdapter = TaskAdapter(
             taskList,
             onTaskCheckedChanged = { position, isChecked ->
@@ -58,77 +95,90 @@ class MainActivity : AppCompatActivity() {
                 if (isChecked) {
                     showConfetti()
                 }
+                saveTasks(taskList, this)
             },
             onDelete = { _, task ->
                 saveTasks(taskList, this)
                 Toast.makeText(this, "Deleted: ${task?.name}", Toast.LENGTH_SHORT).show()
+            },
+            onEditTask = { task ->
+                val position = taskList.indexOf(task)
+                val intent = Intent(this, EditTaskActivity::class.java).apply {
+                    putExtra("task", task)
+                    putExtra("position", position)
+                }
+                editTaskLauncher.launch(intent)
             }
         )
 
         todoRecyclerView.layoutManager = LinearLayoutManager(this)
         todoRecyclerView.adapter = taskAdapter
+    }
 
+    private fun setupItemTouchHelper() {
         val itemTouchHelper = ItemTouchHelper(
-            object : ItemTouchHelper.SimpleCallback(0,
-                ItemTouchHelper.LEFT
-            ){
-            override fun onMove(
-                recyclerView: RecyclerView,
-                viewHolder: RecyclerView.ViewHolder,
-                target: RecyclerView.ViewHolder
-            ): Boolean = false
+            object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+                override fun onMove(
+                    recyclerView: RecyclerView,
+                    viewHolder: RecyclerView.ViewHolder,
+                    target: RecyclerView.ViewHolder
+                ): Boolean = false
 
-            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                val position = viewHolder.adapterPosition
-                taskAdapter.removeTask(position)
-            }
-
-            override fun onChildDraw(
-                c: Canvas,
-                recyclerView: RecyclerView,
-                viewHolder: RecyclerView.ViewHolder,
-                dX: Float,
-                dY: Float,
-                actionState: Int,
-                isCurrentlyActive: Boolean
-            ) {
-                val itemView = viewHolder.itemView
-                val paint = Paint()
-
-                paint.color = Color.RED
-
-                if (dX < 0) {
-                    c.drawRect(
-                        itemView.right.toFloat() + dX,
-                        itemView.top.toFloat(),
-                        itemView.right.toFloat(),
-                        itemView.bottom.toFloat(),
-                        paint
-                    )
+                override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                    val position = viewHolder.adapterPosition
+                    taskAdapter.removeTask(position)
+                    saveTasks(taskList, this@MainActivity)
                 }
 
-                super.onChildDraw(
-                    c,
-                    recyclerView,
-                    viewHolder,
-                    dX,
-                    dY,
-                    actionState,
-                    isCurrentlyActive
-                )
-            }
-        })
+                override fun onChildDraw(
+                    c: Canvas,
+                    recyclerView: RecyclerView,
+                    viewHolder: RecyclerView.ViewHolder,
+                    dX: Float,
+                    dY: Float,
+                    actionState: Int,
+                    isCurrentlyActive: Boolean
+                ) {
+                    val itemView = viewHolder.itemView
+                    val paint = Paint().apply {
+                        color = Color.RED
+                    }
+
+                    if (dX < 0) {
+                        c.drawRect(
+                            itemView.right.toFloat() + dX,
+                            itemView.top.toFloat(),
+                            itemView.right.toFloat(),
+                            itemView.bottom.toFloat(),
+                            paint
+                        )
+                    }
+
+                    super.onChildDraw(
+                        c,
+                        recyclerView,
+                        viewHolder,
+                        dX,
+                        dY,
+                        actionState,
+                        isCurrentlyActive
+                    )
+                }
+            })
 
         itemTouchHelper.attachToRecyclerView(todoRecyclerView)
+    }
 
+    private fun setupButtonListeners() {
         fabAddTask.setOnClickListener {
             val intent = Intent(this, AddTaskActivity::class.java)
-            startActivityForResult(intent, REQUEST_CODE_ADD_TASK)
+            addTaskLauncher.launch(intent)
         }
 
         pieChartButton.setOnClickListener {
-            val intent = Intent(this, PieChartActivity::class.java)
-            intent.putParcelableArrayListExtra("tasks", ArrayList(taskList))
+            val intent = Intent(this, PieChartActivity::class.java).apply {
+                putParcelableArrayListExtra("tasks", ArrayList(taskList))
+            }
             startActivity(intent)
         }
 
@@ -155,27 +205,13 @@ class MainActivity : AppCompatActivity() {
         )
         konfettiView.start(party)
     }
-    @Deprecated("This method has been deprecated in favor of using the Activity Result API\n      which brings increased type safety via an {@link ActivityResultContract} and the prebuilt\n      contracts for common intents available in\n      {@link androidx.activity.result.contract.ActivityResultContracts}, provides hooks for\n      testing, and allow receiving results in separate, testable classes independent from your\n      activity. Use\n      {@link #registerForActivityResult(ActivityResultContract, ActivityResultCallback)}\n      with the appropriate {@link ActivityResultContract} and handling the result in the\n      {@link ActivityResultCallback#onActivityResult(Object) callback}.")
-    @SuppressLint("NotifyDataSetChanged")
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == REQUEST_CODE_ADD_TASK && resultCode == RESULT_OK) {
-            val newTask = data?.getParcelableExtra<Task>("task")
-            newTask?.let {
-                taskList.add(it)
-                taskAdapter.notifyDataSetChanged()
-                saveTasks(taskList, this)
-            }
-            val workRequest = PeriodicWorkRequestBuilder<TaskReminderWorker>(16, TimeUnit.MINUTES).build()
-            WorkManager.getInstance(this).enqueueUniquePeriodicWork(
-                "TaskReminder",
-                ExistingPeriodicWorkPolicy.KEEP,
-                workRequest
-            )
-        }
-    }
 
-    companion object {
-        const val REQUEST_CODE_ADD_TASK = 1
+    private fun scheduleTaskReminders() {
+        val workRequest = PeriodicWorkRequestBuilder<TaskReminderWorker>(16, TimeUnit.MINUTES).build()
+        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
+            "TaskReminder",
+            ExistingPeriodicWorkPolicy.KEEP,
+            workRequest
+        )
     }
 }

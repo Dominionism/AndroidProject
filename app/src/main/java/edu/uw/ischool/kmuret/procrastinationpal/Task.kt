@@ -3,7 +3,7 @@ package edu.uw.ischool.kmuret.procrastinationpal
 import android.content.Context
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
-import com.google.gson.Gson;
+import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
 @Parcelize
@@ -36,5 +36,3 @@ fun loadTasks(context: Context): MutableList<Task> {
         mutableListOf()
     }
 }
-
-

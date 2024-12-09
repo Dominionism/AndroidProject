@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package edu.uw.ischool.kmuret.procrastinationpal
 
 import android.annotation.SuppressLint
@@ -17,7 +19,7 @@ class SettingsActivity : AppCompatActivity() {
     @SuppressLint("MissingInflatedId")
 
     lateinit var phoneText: TextView
-    lateinit var intervalText: TextView
+    private lateinit var intervalText: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,7 +49,7 @@ class SettingsActivity : AppCompatActivity() {
         }
     }
 
-    fun validate () : Boolean {
+    private fun validate () : Boolean {
         var valid = true
         if(phoneText.text.length != 14) {
             Toast.makeText(this, "Invalid Phone Number", Toast.LENGTH_SHORT).show()

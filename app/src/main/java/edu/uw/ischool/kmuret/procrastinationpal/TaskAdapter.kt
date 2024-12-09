@@ -13,7 +13,8 @@ import java.util.Locale
 class TaskAdapter(
     private val taskList: MutableList<Task>,
     private val onTaskCheckedChanged: (position: Int, isChecked: Boolean) -> Unit,
-    private val onDelete: (position: Int, task: Task?) -> Unit
+    private val onDelete: (position: Int, task: Task?) -> Unit,
+    private val onEditTask: (Task) -> Unit
 ) : RecyclerView.Adapter<TaskAdapter.TaskViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskViewHolder {
@@ -55,6 +56,11 @@ class TaskAdapter(
             taskCheckBox.setOnCheckedChangeListener { _, isChecked ->
                 task.isCompleted = isChecked
                 onTaskCheckedChanged(position, isChecked)
+            }
+
+            // Add onClick listener for editing the task
+            itemView.setOnClickListener {
+                onEditTask(task)
             }
         }
     }

@@ -6,4 +6,9 @@
     <string name="procrastination_is_like_a_credit_card_it">Procrastination is like a credit card: it</string>
     <string name="back">Back</string>
     <string name="task_progress">Task Progress</string>
+    <string name="edit_task">Edit Task</string>
+    <string name="task_name">Task Name</string>
+    <string name="select_deadline">Select Deadline</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
 </resources>
