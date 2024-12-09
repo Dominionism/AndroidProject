@@ -33,26 +33,21 @@ class EditTaskActivity : AppCompatActivity() {
         saveTaskButton = findViewById(R.id.saveTaskButton)
         cancelButton = findViewById(R.id.cancelButton)
 
-        // Retrieve the task to be edited
         val task = intent.getParcelableExtra<Task>("task")
 
-        // Populate fields with existing task details
         task?.let {
             editTaskName.setText(it.name)
             selectedTimestamp = it.deadlineTimestamp
             isCompleted = it.isCompleted
 
-            // Format and display the current deadline
             val dateFormat = SimpleDateFormat("yyyy-MM-dd hh:mm a", Locale.getDefault())
             editTaskDeadline.text = dateFormat.format(Date(selectedTimestamp))
         }
 
-        // Set up deadline selection
         editTaskDeadline.setOnClickListener {
             showDateTimePicker()
         }
 
-        // Save task
         saveTaskButton.setOnClickListener {
             val taskName = editTaskName.text.toString().trim()
 
@@ -66,10 +61,8 @@ class EditTaskActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            // Create updated task
             val updatedTask = Task(taskName, selectedTimestamp, isCompleted)
 
-            // Return result to calling activity
             val resultIntent = Intent().apply {
                 putExtra("task", updatedTask)
                 putExtra("position", intent.getIntExtra("position", -1))
@@ -78,7 +71,6 @@ class EditTaskActivity : AppCompatActivity() {
             finish()
         }
 
-        // Cancel editing
         cancelButton.setOnClickListener {
             setResult(Activity.RESULT_CANCELED)
             finish()
@@ -88,7 +80,6 @@ class EditTaskActivity : AppCompatActivity() {
     private fun showDateTimePicker() {
         val calendar = Calendar.getInstance()
 
-        // Date picker
         val datePicker = DatePickerDialog(
             this,
             { _, year, monthOfYear, dayOfMonth ->
@@ -96,17 +87,14 @@ class EditTaskActivity : AppCompatActivity() {
                 calendar.set(Calendar.MONTH, monthOfYear)
                 calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
 
-                // Time picker
                 val timePicker = TimePickerDialog(
                     this,
                     { _, hourOfDay, minute ->
                         calendar.set(Calendar.HOUR_OF_DAY, hourOfDay)
                         calendar.set(Calendar.MINUTE, minute)
 
-                        // Update selected timestamp
                         selectedTimestamp = calendar.timeInMillis
 
-                        // Format and display selected date and time
                         val dateFormat = SimpleDateFormat("yyyy-MM-dd hh:mm a", Locale.getDefault())
                         editTaskDeadline.text = dateFormat.format(calendar.time)
                     },
