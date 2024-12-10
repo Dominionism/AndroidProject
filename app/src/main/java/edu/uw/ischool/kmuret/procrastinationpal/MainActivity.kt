@@ -226,9 +226,27 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
+        val messages = listOf(
+            "Hey, genius, remember that thing you said you'd do? It's still waiting. Tick-tock.",
+            "If procrastination were an Olympic sport, you’d have the gold. Finish your task!",
+            "Your task called. It said, 'Stop ghosting me, you slacker.'",
+            "Friendly reminder: Your future self is judging you for not doing this yet.",
+            "You’ll binge Netflix but can’t finish one tiny task? Priorities, please.",
+            "Stop scrolling, start doing. Unless you're Googling 'how to get my life together.'",
+            "Breaking News: The task is still not done. Details at 11.",
+            "Don’t make me come over there and finish this for you. You won't like it.",
+            "If ignoring your responsibilities were a job, you’d be employee of the month.",
+            "Your to-do list just texted me. It says, 'WTF, bro?'",
+            "Oh look, another hour passed. Another hour you didn’t do the thing.",
+            "I swear, if avoiding tasks burned calories, you'd be ripped by now. Get it done!",
+            "You absolute clown, are you allergic to productivity? Do the task already!"
+        )
+
+        val randomMessage = messages.random()
+
         val inputData = workDataOf(
             "phoneNumber" to reminderPhoneNumber,
-            "message" to "Don't forget to complete your tasks!"
+            "message" to randomMessage
         )
 
         val workRequest = PeriodicWorkRequestBuilder<TaskReminderWorker>(reminderInterval!!, TimeUnit.MINUTES).setInputData(inputData).build()
