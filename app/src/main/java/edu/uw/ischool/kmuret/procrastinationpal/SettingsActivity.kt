@@ -43,8 +43,13 @@ class SettingsActivity : AppCompatActivity() {
         val submitButton: Button = findViewById(R.id.submitButton)
         submitButton.setOnClickListener {
             if(validate()) {
-                val intent = Intent(this, MainActivity::class.java)
-                startActivity(intent)
+                val phoneNumber = phoneText.text.toString()
+                val resultIntent = Intent().apply {
+                    putExtra("number", phoneNumber)
+                    putExtra("interval", intervalText.text.toString().toLong())
+                }
+                setResult(RESULT_OK, resultIntent)
+                finish()
             }
         }
     }
@@ -55,8 +60,8 @@ class SettingsActivity : AppCompatActivity() {
             Toast.makeText(this, "Invalid Phone Number", Toast.LENGTH_SHORT).show()
             valid = false
         }
-        if(intervalText.text.isEmpty()) {
-            Toast.makeText(this, "Please Enter Time", Toast.LENGTH_SHORT).show()
+        if(intervalText.text.isEmpty() || intervalText.text.toString().toInt() < 16) {
+            Toast.makeText(this, "Please Enter Time >15 Minutes", Toast.LENGTH_SHORT).show()
             valid = false
         }
         return valid

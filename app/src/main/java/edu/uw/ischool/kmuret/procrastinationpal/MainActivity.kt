@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
+import androidx.work.workDataOf
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import nl.dionsegijn.konfetti.core.Party
 import nl.dionsegijn.konfetti.core.Position
@@ -32,6 +33,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var settingsButton: ImageButton
     private lateinit var konfettiView: KonfettiView
     private lateinit var motivation: ImageButton
+    private var reminderPhoneNumber: String? = null
+    private var reminderInterval: Long? = null
 
     private var taskList = mutableListOf<Task>()
     private lateinit var taskAdapter: TaskAdapter
@@ -64,6 +67,16 @@ class MainActivity : AppCompatActivity() {
                 // Schedule periodic work for task reminders
                 scheduleTaskReminders()
             }
+        }
+    }
+
+    private val settingsLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == RESULT_OK) {
+            reminderPhoneNumber = result.data?.getStringExtra("number")
+            reminderInterval = result.data?.getLongExtra("interval",16)
+            scheduleTaskReminders()
         }
     }
 
@@ -184,7 +197,7 @@ class MainActivity : AppCompatActivity() {
 
         settingsButton.setOnClickListener {
             val intent = Intent(this, SettingsActivity::class.java)
-            startActivity(intent)
+            settingsLauncher.launch(intent)
         }
 
         motivation.setOnClickListener {
@@ -206,8 +219,19 @@ class MainActivity : AppCompatActivity() {
         konfettiView.start(party)
     }
 
+
     private fun scheduleTaskReminders() {
-        val workRequest = PeriodicWorkRequestBuilder<TaskReminderWorker>(16, TimeUnit.MINUTES).build()
+        if (reminderPhoneNumber == null) {
+            Toast.makeText(this, "Phone number is missing. Set it in settings.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val inputData = workDataOf(
+            "phoneNumber" to reminderPhoneNumber,
+            "message" to "Don't forget to complete your tasks!"
+        )
+
+        val workRequest = PeriodicWorkRequestBuilder<TaskReminderWorker>(reminderInterval!!, TimeUnit.MINUTES).setInputData(inputData).build()
         WorkManager.getInstance(this).enqueueUniquePeriodicWork(
             "TaskReminder",
             ExistingPeriodicWorkPolicy.KEEP,

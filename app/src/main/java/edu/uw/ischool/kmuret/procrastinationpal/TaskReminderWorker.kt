@@ -9,8 +9,11 @@ import androidx.work.WorkerParameters
 
 class TaskReminderWorker(appContext: Context, workerParameters: WorkerParameters): CoroutineWorker(appContext, workerParameters) {
     override suspend fun doWork(): Result {
+        val phoneNumber = inputData.getString("phoneNumber")
+        val message = inputData.getString("message")
+
         val smsManager = SmsManager.getDefault()
-        smsManager.sendTextMessage("Enter#", null, "Do your tasks man", null, null)
+        smsManager.sendTextMessage(phoneNumber, null, message, null, null)
         return Result.success()
     }
 }
